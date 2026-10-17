@@ -18,8 +18,9 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
+      # Se actualiza a la versión v4 para solucionar el error de compatibilidad
       - name: Configurar Android SDK
-        uses: android-actions/setup-android@v3
+        uses: android-actions/setup-android@v4
 
       - name: Configurar Gradle
         uses: gradle/actions/setup-gradle@v3
