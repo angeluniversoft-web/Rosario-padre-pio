@@ -1,1 +1,276 @@
 
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Rosario Padre Pío</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/page-flip/dist/js/page-flip.browser.js"></script>
+
+    <style>
+        body { margin: 0; padding: 0; background-color: #1A0F0A; display: flex; justify-content: center; align-items: center; height: 100vh; overflow: hidden; touch-action: none; }
+        #book { width: 100%; height: 100%; background-color: #FDF8F0; box-shadow: 0 0 20px rgba(0,0,0,0.5); }
+        .page { background-color: #FDF8F0; overflow-y: auto; overflow-x: hidden; border: 1px solid #e0d0b0; }
+        
+        .page-content {
+            width: 100%; min-height: 100%; box-sizing: border-box; padding: 25px 25px;
+            display: flex; flex-direction: column; align-items: center; text-align: center;
+            font-family: 'Cormorant Garamond', serif; color: #1A0F0A;
+            background-image: radial-gradient(circle at center, #FDF8F0 0%, #F2E6D5 100%);
+        }
+
+        .page-cover { background-color: #1A0F0A; border: 2px solid #B8893B; }
+        .page-cover .page-content { background-image: none; background-color: transparent; color: #FDF8F0; justify-content: center; display: flex;}
+        
+        /* LETRAS GRANDES Y REPINTADAS */
+        h1 { font-family: 'Cinzel', serif; color: #B8893B; font-size: 36px; letter-spacing: 2px; margin-bottom: 20px; line-height: 1.2; font-weight: 700;}
+        h2 { font-family: 'Cinzel', serif; color: #7B1E28; font-size: 34px; margin-top: 15px; line-height: 1.2; font-weight: 700;}
+        h3 { font-family: 'Cinzel', serif; color: #B8893B; font-size: 20px; letter-spacing: 2px; margin-bottom: 10px; font-weight: 600;}
+        
+        /* IMÁGENES DE FONDO SUAVES */
+        .random-img { 
+            width: 90%; 
+            max-height: 30vh; 
+            object-fit: cover; 
+            border-radius: 12px; 
+            border: 2px solid rgba(184, 137, 59, 0.3);
+            margin: 15px 0; 
+            opacity: 0.35; 
+            filter: sepia(0.4) contrast(0.8); 
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        
+        .cita { font-style: italic; color: #2C4E7A; font-size: 24px; margin: 15px 0; font-weight: 700; line-height: 1.4;}
+        .texto { font-size: 22px; line-height: 1.6; text-align: justify; margin-top: 15px; font-weight: 500;}
+        .oraciones { font-size: 22px; line-height: 1.6; font-style: italic; margin-top: 20px; color: #4A2418; font-weight: 600;}
+        
+        .portadilla .page-content { justify-content: center; color: #FDF8F0;}
+        .portadilla h1 { font-size: 46px; line-height: 1.2; margin-bottom: 10px;}
+        .portadilla p { font-style: italic; font-size: 26px; margin: 5px 0;}
+        .portadilla .cita { color: #FDF8F0; font-weight: normal; margin-top: 30px; font-size: 22px;}
+
+        #btn-settings { position: fixed; top: 15px; right: 15px; z-index: 1000; background: #1A0F0A; color: #B8893B; border: 2px solid #B8893B; border-radius: 50%; width: 50px; height: 50px; font-size: 24px; cursor: pointer; display: flex; justify-content: center; align-items: center; box-shadow: 0 4px 10px rgba(0,0,0,0.6); }
+        #settings-panel { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(26, 15, 10, 0.95); z-index: 2000; flex-direction: column; justify-content: center; align-items: center; font-family: 'Cormorant Garamond', serif; }
+        .settings-box { background: #FDF8F0; color: #1A0F0A; padding: 25px; border-radius: 12px; width: 85%; max-width: 450px; border: 4px solid #B8893B; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5);}
+        .settings-box h2 { font-size: 30px; margin-top: 0; color: #7B1E28; }
+        .settings-box p { font-size: 22px; margin-bottom: 20px; line-height: 1.4;}
+        .upload-btn { display: block; background: #2C4E7A; color: #FDF8F0; padding: 15px; margin: 15px 0; border-radius: 8px; cursor: pointer; font-size: 22px; font-weight: bold; font-family: 'Cinzel', serif; letter-spacing: 1px; border: none;}
+        .upload-btn input[type="file"] { display: none; }
+        .close-btn { background: #7B1E28; color: white; border: none; padding: 15px; border-radius: 8px; font-size: 22px; margin-top: 20px; cursor: pointer; font-family: 'Cinzel', serif; width: 100%;}
+    </style>
+</head>
+<body>
+
+    <button id="btn-settings" onclick="toggleSettings()">⚙️</button>
+    
+    <div id="settings-panel">
+        <div class="settings-box">
+            <h2>Tus Fotos Sagradas</h2>
+            <p>Sube varias fotos. Se colocarán de fondo con un toque suave.</p>
+            <label class="upload-btn">
+                📸 Seleccionar Fotos
+                <input type="file" accept="image/*" multiple onchange="handleMultipleImages(event)">
+            </label>
+            <button class="close-btn" onclick="toggleSettings()">VOLVER AL LIBRO</button>
+        </div>
+    </div>
+
+    <div id="book">
+        <!-- PORTADA -->
+        <div class="page page-cover" data-density="hard">
+            <div id="bg-cover" class="page-content" style="background-image: linear-gradient(rgba(26,15,10,0.85), rgba(26,15,10,0.95)), url('https://images.unsplash.com/photo-1596369970141-f9023507a3c6?q=80&w=1000&auto=format&fit=crop'); background-size: cover; background-position: center;">
+                <h1>EL SANTO ROSARIO</h1>
+                <p style="font-size: 30px; line-height: 1.2; font-style: italic;">«Con el Santo Rosario, se ganan batallas.»</p>
+                <span style="color: #B8893B; font-family: 'Cinzel', serif; margin-top: 20px; font-size: 20px;">— SAN PADRE PÍO —</span>
+            </div>
+        </div>
+
+        <!-- INTRODUCCIÓN -->
+        <div class="page">
+            <div class="page-content">
+                <h3>INTRODUCCIÓN</h3>
+                <h2>Padre Pío y el Rosario</h2>
+                <img src="" class="random-img" alt="Virgen">
+                <div class="texto">
+                    El Rosario era la devoción preferida del Padre Pío. Consideraba el Rosario como su arma predilecta contra toda clase de enemigos. Lo rezaba de continuo. Era el fraile del Rosario, así lo llamaban y así él aconsejaba a los cristianos. "Amen a la Virgen y háganla amar." La oración del Rosario es la oración que hace triunfar de todo y a todos. Ella, María, nos lo ha enseñado así, lo mismo que, Jesús, nos enseñó el Padre Nuestro.
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= GOZOSOS ================= -->
+        <div class="page portadilla grupo-gozosos" style="background-color: #2C4E7A;">
+            <div class="page-content">
+                <h1>MISTERIOS<br>GOZOSOS</h1>
+                <p style="color: #B8893B; font-family: 'Cinzel', serif; font-size: 20px;">LUNES Y SÁBADOS</p>
+                <p class="cita">“Ora y espera, no te inquietes. La inquietud no conduce a nada. Dios es misericordioso y escuchará tu oración”</p>
+            </div>
+        </div>
+
+        <div class="page grupo-gozosos">
+            <div class="page-content">
+                <h3>PRIMER MISTERIO GOZOSO</h3>
+                <h2>La Anunciación</h2>
+                <img src="" class="random-img">
+                <div class="oraciones">Padre nuestro, que estás en el Cielo, Santificado sea tu Nombre; venga a nosotros tu Reino; hágase tu Voluntad, en la Tierra como en el Cielo. Danos hoy nuestro pan de cada día; perdona nuestras ofensas, como también nosotros perdonamos a los que nos ofenden; no nos dejes caer en la tentación, y líbranos del mal. Amén.</div>
+                <div class="cita" style="font-size: 20px; text-align: left;">
+                    1.- El Ángel Gabriel fue enviado por Dios a una Virgen, y el nombre de la Virgen, era María. <br><br>
+                    2.- "Alégrate, llena de Gracia, el Señor es contigo."<br><br>
+                    3.- Al oír estas palabras, María se turbó y se preguntaba qué podría significar este saludo.<br><br>
+                    4.- Mas el Ángel le dijo: "No temas, María, porque has hallado gracia con Dios."<br><br>
+                    5.- "He aquí que vas a concebir en tu seno y darás a luz a un hijo, y le pondrás por nombre, Jesús."<br><br>
+                    6.- "Él será llamado ‘Hijo del Altísimo’ y su reino no tendrá fin."<br><br>
+                    7.- Entonces María dijo al Ángel: "¿Cómo podrá ser, pues no conozco varón?"<br><br>
+                    8.- "El Espíritu Santo vendrá sobre ti y el poder del Altísimo te cubrirá."<br><br>
+                    9.- "Porque, el Santo Ser que nacerá, será llamado 'Hijo de Dios'."<br><br>
+                    10.- Entonces, María dijo: "He aquí la esclava del Señor. Hágase en mí, según Tu Palabra."
+                </div>
+                <div class="texto" style="text-align: center; font-weight: bold; margin-top: 20px;">(10 Ave Marías)<br><br>Gloria al Padre, y al Hijo y al Espíritu Santo. Como era en el principio, ahora y siempre, y por los siglos de los siglos. Amén.<br><br>Oración de Fátima y Jaculatorias</div>
+            </div>
+        </div>
+        <div class="page grupo-gozosos"><div class="page-content"><h3>SEGUNDO MISTERIO GOZOSO</h3><h2>María visita a su prima Santa Isabel</h2><img src="" class="random-img"><div class="oraciones">Padre Nuestro...</div><div class="cita" style="font-size: 20px; text-align: left;">1.- En aquellos días, María fue a una región montañosa, entró en la casa de Zacarías y saludó a Isabel.<br><br>2.- Cuando Isabel oyó el saludo de María, el Niño saltó de gozo en su seno, e Isabel quedó llena del Espíritu Santo.<br><br>3.- Y exclamó en voz alta: "Bendita, Tú, entre las mujeres, y bendito el Fruto de tu seno."<br><br>4.- "Dichosa, Tú, que has creído, porque se cumplirán en ti las promesas hechas por el Señor."<br><br>5.- Y María dijo: "Mi alma glorifica al Señor, y mi espíritu se regocija en Dios, mi Salvador. Porque ha mirado la humillación de su esclava."<br><br>6.- "Y he aquí que desde ahora, me llamarán todas las generaciones, Bendita. Porque Aquel que es Todo Poderoso, hizo cosas grandes en mí."<br><br>7.- Santo es Su Nombre y Su Misericordia, para los que le temen, no variará de generación en generación.<br><br>8.- “Desplegó el poder de su brazo, dispersó a los que se vanaglorian y a los orgullosos de corazón.”<br><br>9.- “Quitó del trono a los poderosos y ensalzó a los humildes.”<br><br>10.- "Colmó de bienes a los hambrientos, y a los ricos despidió vacíos."</div><div class="texto" style="text-align: center; font-weight: bold;">(10 Ave Marías)<br><br>Gloria al Padre...<br><br>Oración de Fátima y Jaculatorias</div></div></div>
+        <div class="page grupo-gozosos"><div class="page-content"><h3>TERCER MISTERIO GOZOSO</h3><h2>El nacimiento de Jesús</h2><img src="" class="random-img"><div class="oraciones">Padre Nuestro...</div><div class="cita" style="font-size: 20px; text-align: left;">1.- Mientras estaban María y José en Belén, llegó para ella el tiempo de su alumbramiento.<br><br>2.- Y dio a luz a su Primogénito y lo envolvió en pañales.<br><br>3.- Y lo acostó en un pesebre, porque no hubo lugar para ellos en la posada.<br><br>4.- Había en aquel entorno unos pastores, y he aquí que un Ángel del Señor se les apareció.<br><br>5.- Y les dijo: "No temáis. Os anuncio una gran alegría para todo el pueblo."<br><br>6.- "Pues hoy, os ha nacido en la ciudad de David, un Salvador que es Cristo Señor."<br><br>7.- Gloria a Dios en las alturas y en la Tierra paz a los hombres de buena voluntad.<br><br>8.- Llegaron del oriente unos Magos y entrando en la casa vieron al Niño con María, su Madre.<br><br>9.- Entonces, postrándose, lo adoraron y le ofrecieron sus dones: Oro, incienso y mirra.<br><br>10.- Y María guardaba todas estas cosas, y las meditaba en su corazón.</div><div class="texto" style="text-align: center; font-weight: bold;">(10 Ave Marías)<br><br>Gloria al Padre...<br><br>Oración de Fátima y Jaculatorias</div></div></div>
+        <div class="page grupo-gozosos"><div class="page-content"><h3>CUARTO MISTERIO GOZOSO</h3><h2>La Presentación en el Templo</h2><img src="" class="random-img"><div class="oraciones">Padre Nuestro...</div><div class="cita" style="font-size: 20px; text-align: left;">1.- Según la Ley de Moisés, llevaron a Jesús a Jerusalén para presentarlo al Señor.<br><br>2.- Y he aquí, que había en Jerusalén un hombre llamado Simeón. Hombre justo y piadoso.<br><br>3.- …a quien le había sido revelado, por el Espíritu Santo, que no moriría, sin haber visto al Cristo del Señor.<br><br>4.- Y cuando María y José, sus padres, llevaron al Niño Jesús al templo, él lo tomó en sus brazos y bendijo a Dios.<br><br>5.- "Ahora, Señor, puedes dejar que tu siervo muera en paz, según Tu Palabra."<br><br>6.- "Porque mis ojos han visto la salvación que preparaste a la vista de todos los pueblos."<br><br>7.- "Luz de revelación para los gentiles, y gloria de tu pueblo Israel."<br><br>8.- Y dijo a María, su Madre: "Este Niño está destinado para la caída y para la elevación de muchos en Israel. Y para ser una señal de contradicción."<br><br>9.- "Y a tu misma alma, una espada la traspasará, a fin de que sean descubiertos los pensamientos de muchos corazones."<br><br>10.- Volvieron a su ciudad de Nazaret y el Niño crecía lleno de sabiduría. Y la Gracia de Dios, estaba en él.</div><div class="texto" style="text-align: center; font-weight: bold;">(10 Ave Marías)<br><br>Gloria al Padre...<br><br>Oración de Fátima y Jaculatorias</div></div></div>
+        <div class="page grupo-gozosos"><div class="page-content"><h3>QUINTO MISTERIO GOZOSO</h3><h2>El Niño perdido y hallado</h2><img src="" class="random-img"><div class="oraciones">Padre Nuestro...</div><div class="cita" style="font-size: 20px; text-align: left;">1.- Cuando tuvo Jesús doce años, fueron a Jerusalén, según la costumbre, para la fiesta de la Pascua.<br><br>2.- Mas a su regreso, se quedó el Niño Jesús en Jerusalén, sin que sus padres lo advirtieran.<br><br>3.- Se volvieron a Jerusalén en su busca, y al cabo de tres días lo encontraron en el templo.<br><br>4.- Estaba en medio de los doctores de la ley, escuchándolos e interrogándolos.<br><br>5.- Y todos los que le oían, estaban asombrados de su inteligencia y de sus respuestas.<br><br>6.- "Hijo, ¿por qué te has comportado así con nosotros? Tu padre y yo te hemos buscado con angustia."<br><br>7.- "¿Cómo es que me buscan? ¿No saben que debo atender los asuntos de Mi Padre?"<br><br>8.- Pero ellos no entendieron estas palabras.<br><br>9.- Y regresó con ellos a Nazaret y les estaba sujeto.<br><br>10.- Jesús crecía en sabiduría, en edad y en gracia ante Dios y ante los Hombres.</div><div class="texto" style="text-align: center; font-weight: bold;">(10 Ave Marías)<br><br>Gloria al Padre...<br><br>Oración de Fátima y Jaculatorias</div></div></div>
+
+        <!-- ================= LUMINOSOS ================= -->
+        <div class="page portadilla grupo-luminosos" style="background-color: #8B6F1E;">
+            <div class="page-content"><h1>MISTERIOS<br>LUMINOSOS</h1><p style="color: #B8893B; font-family: 'Cinzel', serif; font-size: 20px;">JUEVES</p><p class="cita">“La oración es la mejor arma que tenemos, es una llave que abre el Corazón de Dios.”</p></div>
+        </div>
+        <div class="page grupo-luminosos"><div class="page-content"><h3>PRIMER MISTERIO LUMINOSO</h3><h2>El Bautismo en el Jordán</h2><img src="" class="random-img"><div class="oraciones">Padre Nuestro...</div><div class="cita" style="font-size: 20px; text-align: left;">1.- Jesús vino desde Galilea al Jordán y se presentó a Juan para que lo bautizara.<br><br>2.- Juan trataba de impedírselo diciendo: Yo soy el que necesita ser bautizado por ti, ¿Y tú, vienes a mí?<br><br>3.- Jesús le respondió: Olvida eso ahora, pues conviene que cumplamos lo que Dios ha dispuesto. Entonces, Juan, accedió.<br><br>4.- A quien no conoció pecado, Dios le hizo pecado por nosotros, para que viniésemos a ser justicia en Él.<br><br>5.- El que no nazca del agua y del espíritu, no puede entrar en el Reino de Dios.<br><br>6.- Jesús, ya bautizado, se hallaba en oración y se abrió el Cielo.<br><br>7.- Bajó sobre Él el Espíritu Santo, en forma corporal, como una Paloma.<br><br>8.- El Espíritu del Señor está sobre mí, me ha ungido para anunciar la buena noticia a los pobres.<br><br>9.- Y una voz que venía del cielo decía: “Este es mi Hijo Amado, en quien me complazco”<br><br>10.- Todos los que se dejan guiar por el Espíritu de Dios, son hijos de Dios.</div><div class="texto" style="text-align: center; font-weight: bold;">(10 Ave Marías)<br><br>Gloria al Padre...</div></div></div>
+        <div class="page grupo-luminosos"><div class="page-content"><h3>SEGUNDO MISTERIO LUMINOSO</h3><h2>Las bodas de Caná</h2><img src="" class="random-img"><div class="oraciones">Padre Nuestro...</div><div class="cita" style="font-size: 20px; text-align: left;">1.- En Caná, de Galilea, se celebraba una boda y estaba invitada la Madre de Jesús. También lo estaban Jesús y sus discípulos.<br><br>2.- Sucedió que se les acabó el vino y entonces la Madre de Jesús le dijo: “No tienen vino”.<br><br>3.- Jesús le respondió: “¿Qué a ti y a mí mujer? Todavía no ha llegado mi hora”<br><br>4.- Entonces, dijo su Madre a los sirvientes: “Hagan lo que Él les diga”<br><br>5.- Había allí seis tinajas de piedra para las purificaciones de los judíos, de dos o tres medidas, cada una.<br><br>6.- Jesús dijo a los que servían “Llenen las tinajas de agua”, y las llenaron hasta arriba.<br><br>7.- “Saquen ahora un poco y llévenlo al encargado de la fiesta”, y ellos, lo llevaron.<br><br>8.- Cuando el encargado probó el agua convertida en vino, llamó al novio.<br><br>9.- Y le dice: “Todos sirven primero el vino bueno, y cuando ya están bebidos, el inferior, pero tú, has guardado el vino bueno hasta ahora”.<br><br>10.- Fue el primer Signo realizado por Jesús. Así, manifestó su Gloria, y sus discípulos creyeron en Él.</div><div class="texto" style="text-align: center; font-weight: bold;">(10 Ave Marías)<br><br>Gloria al Padre...</div></div></div>
+        <div class="page grupo-luminosos"><div class="page-content"><h3>TERCER MISTERIO LUMINOSO</h3><h2>El Anuncio del Reino</h2><img src="" class="random-img"><div class="oraciones">Padre Nuestro...</div><div class="cita" style="font-size: 20px; text-align: left;">1.- Jesús comenzó a predicar y decir: “Conviértanse, porque el Reino de Dios ha llegado”.<br><br>2.- “Bienaventurados los misericordiosos, porque ellos alcanzarán misericordia”.<br><br>3.- “Dejen que los niños vengan a mí, porque de los que son como ellos, es el Reino de Dios”<br><br>4.- “Vengan, benditos de mi Padre, reciban la herencia del reino, preparado para ustedes desde la creación del mundo”.<br><br>5.- Jesús, viendo la fe del paralítico dijo: “hombre, tus pecados te quedan perdonados.” Luego añadió: “A ti te lo digo, levántate, toma tu camilla y vete a tu casa”<br><br>6.- “Hay más alegría en el cielo por un pecador que se convierte que por 99 justos que no tienen necesidad de conversión”<br><br>7.- Jesús dijo a Zaqueo: “Hoy ha llegado la salvación a esta casa, porque también este es un hijo de Abraham. Pues el hijo del hombre ha venido a buscar lo que estaba perdido”.<br><br>8.- Jesús dijo a la mujer adúltera “Mujer, ¿dónde están los que te condenan? ¿Nadie te ha condenado?” Ella respondió: Nadie, Señor. Jesús le dijo: “Tampoco yo te condeno. Vete, y en adelante no peques más”<br><br>9.- Jesús dijo a sus discípulos: “Les doy un mandamiento nuevo, que se amen los unos a los otros como yo los he amado. En esto conocerán que son mis discípulos, si se aman los unos a los otros”.<br><br>10.- Jesús recorría todas las ciudades y aldeas, enseñando en sus sinagogas, proclamando la buena nueva del reino y sanando de toda enfermedad y dolencia.</div><div class="texto" style="text-align: center; font-weight: bold;">(10 Ave Marías)<br><br>Gloria al Padre...</div></div></div>
+        <div class="page grupo-luminosos"><div class="page-content"><h3>CUARTO MISTERIO LUMINOSO</h3><h2>La Transfiguración</h2><img src="" class="random-img"><div class="oraciones">Padre Nuestro...</div><div class="cita" style="font-size: 20px; text-align: left;">1.- Jesús tomó consigo a Pedro, Juan y Santiago y subió al monte a orar.<br><br>2.- Mientras oraba, el aspecto de su rostro se mudó y sus vestidos eran de un blanco fulgurante.<br><br>3.- Y he aquí que conversaban con Él dos hombres. Eran Moisés y Elías, los cuales aparecían en su Gloria.<br><br>4.- Hablaban de su partida que iba a cumplir en Jerusalén.<br><br>5.- Entonces, Pedro dijo a Jesús: “Maestro, bueno es estarnos aquí”.<br><br>6.- “Hagamos tres tiendas: Una para ti, otra para Moisés y otra para Elías”, sin saber lo que decía.<br><br>7.- Estaba diciendo estas cosas, cuando se formó una nube, y al entrar en la nube, se llenaron de temor.<br><br>8.- Y vino una voz desde la nube que decía “Este es mi hijo, mi elegido, escúchenlo”.<br><br>9.- Al oír esto, los discípulos cayeron rostro en tierra, llenos de miedo.<br><br>10.- Cuando cesó la voz, Jesús quedó solo, entonces, se acercó, tocó a sus discípulos y les dijo: “Levántense, no tengan miedo”</div><div class="texto" style="text-align: center; font-weight: bold;">(10 Ave Marías)<br><br>Gloria al Padre...</div></div></div>
+        <div class="page grupo-luminosos"><div class="page-content"><h3>QUINTO MISTERIO LUMINOSO</h3><h2>La Institución de la Eucaristía</h2><img src="" class="random-img"><div class="oraciones">Padre Nuestro...</div><div class="cita" style="font-size: 20px; text-align: left;">1.- Antes de la fiesta de la Pascua, sabiendo Jesús que había llegado su hora de pasar de este mundo al Padre, habiendo amado a los suyos, que estaban en el mundo, los amó hasta el extremo.<br><br>2.- Llegada la hora, Jesús se puso a la mesa con los apóstoles y les dijo: “Como he deseado celebrar esta Pascua con ustedes antes de padecer”<br><br>3.- “Porque les aseguro que ya no la comeré más hasta que tenga su cumplimiento en el Reino de Dios.”<br><br>4.- Tomó luego pan, dio gracias, lo partió y se los dio diciendo: “Este es mi cuerpo que se entrega por ustedes”<br><br>5.- “Yo Soy el Pan Vivo bajado del Cielo. Si uno come de este Pan, vivirá para siempre”<br><br>6.- “Y el pan que yo les voy a dar, es mi Carne, por la vida del mundo”<br><br>7.- De igual modo, después de cenar, tomó la copa diciendo: “Esta copa es la Nueva Alianza en mi Sangre, que se derrama por ustedes”<br><br>8.- “Yo Soy el Pan de Vida, el que venga a mí no tendrá hambre, el que crea en mí, no tendrá nunca sed”<br><br>9.- “El que come mi Carne y bebe mi Sangre, tiene Vida Eterna y Yo lo resucitaré el último día”<br><br>10.- “Cuantas veces beban de este Cáliz, háganlo en memoria mía, así pues cada vez que coman de este Pan y beban de este Cáliz anuncian la muerte del Señor, hasta que venga”</div><div class="texto" style="text-align: center; font-weight: bold;">(10 Ave Marías)<br><br>Gloria al Padre...</div></div></div>
+
+        <!-- ================= DOLOROSOS ================= -->
+        <div class="page portadilla grupo-dolorosos" style="background-color: #7B1E28;">
+            <div class="page-content"><h1>MISTERIOS<br>DOLOROSOS</h1><p style="color: #B8893B; font-family: 'Cinzel', serif; font-size: 20px;">MARTES Y VIERNES</p><p class="cita">«Trae a tu memoria lo que sucedía en el Corazón de nuestra Madre del cielo al pie de la cruz.»</p></div>
+        </div>
+        <div class="page grupo-dolorosos"><div class="page-content"><h3>PRIMER MISTERIO DOLOROSO</h3><h2>La Agonía en el Huerto</h2><img src="" class="random-img"><div class="oraciones">Padre Nuestro...</div><div class="cita" style="font-size: 20px; text-align: left;">1.- Jesús llegó con ellos al huerto llamado Getsemaní, y comenzó a entristecerse y angustiarse.<br><br>2.- Después les dijo: "Mi Alma está mortalmente triste. Quedaos aquí y velad conmigo."<br><br>3.- Y apartándose un poco, se postró con el rostro en tierra, y oró.<br><br>4.- "Padre, si quieres, aparta de mí este cáliz, pero no se haga mi voluntad, sino la Tuya."<br><br>5.- Y mientras oraba, se le apareció un Ángel venido del Cielo y lo confortaba.<br><br>6.- Y entrando en agonía, oraba sin cesar.<br><br>7.- Y su sudor era como gotas de sangre que caían sobre la tierra.<br><br>8.- Y yendo hacia los discípulos, los encontró durmiendo y les dijo: "¿No habéis podido siquiera una hora velar conmigo?"<br><br>9.- "Velad y orad, para que no caigáis en tentación."<br><br>10.- "El Espíritu dispuesto está, mas la carne es débil."</div><div class="texto" style="text-align: center; font-weight: bold;">(10 Ave Marías)<br><br>Gloria al Padre...</div></div></div>
+        <div class="page grupo-dolorosos"><div class="page-content"><h3>SEGUNDO MISTERIO DOLOROSO</h3><h2>La Flagelación</h2><img src="" class="random-img"><div class="oraciones">Padre Nuestro...</div><div class="cita" style="font-size: 20px; text-align: left;">1.- Después de atar a Jesús, lo entregaron a Pilato, y este le preguntó: "¿Eres tú el Rey de los Judíos?"<br><br>2.- Contestó Jesús: "Mi Reino no es de este mundo, pero como dices, soy Rey."<br><br>3.- "Yo para eso nací y para eso vine al mundo, para dar testimonio de la verdad. Y todo el que es de la verdad, escucha mi voz."<br><br>4.- Pilato le preguntó: "¿Qué es la verdad?" Y salió y dijo a los Judíos: "Yo no encuentro culpa alguna en Él."<br><br>5.- "Por tanto, lo mandaré castigar y lo dejaré en libertad." Entonces Pilato, ordenó que lo azotaran.<br><br>6.- Fue un hombre despreciado, el desecho de los hombres, varón de dolores.<br><br>7.- Fue maltratado y se humilló sin decir palabra. Como cordero que es llevado al matadero.<br><br>8.- Fue traspasado por nuestros pecados, quebrantado por nuestras culpas.<br><br>9.- Él, en verdad, ha tomado sobre sí nuestros sufrimientos. Ha cargado con nuestros dolores.<br><br>10.- El castigo cayó sobre Él. Y a través de sus llagas, hemos sido curados.</div><div class="texto" style="text-align: center; font-weight: bold;">(10 Ave Marías)<br><br>Gloria al Padre...</div></div></div>
+        <div class="page grupo-dolorosos"><div class="page-content"><h3>TERCER MISTERIO DOLOROSO</h3><h2>La Coronación de Espinas</h2><img src="" class="random-img"><div class="oraciones">Padre Nuestro...</div><div class="cita" style="font-size: 20px; text-align: left;">1.- Los soldados lo condujeron al pretorio, lo despojaron de sus vestidos y lo revistieron con un manto de color púrpura.<br><br>2.- Trenzaron también una corona de espinas, y la colocaron sobre su cabeza. Y pusieron una caña en su mano derecha.<br><br>3.- Y doblando la rodilla delante de Él, lo escarnecían diciendo: "¡Salve, Rey de los Judíos"<br><br>4.- Y escupiendo sobre Él, tomaban la caña y lo golpeaban en la cabeza.<br><br>5.- Pilato tomó agua, y se lavó las manos delante del pueblo, diciendo: "Yo soy inocente de la sangre de este justo."<br><br>6.- Entonces Jesús salió, con la corona de espinas y el manto de color púrpura.<br><br>7.- "He aquí al hombre." Dijo Pilato. Pero ellos se pusieron a gritar: "¡Crucifícalo, crucifícalo!"<br><br>8.- "¿Por qué? ¿Qué mal ha hecho?" Y ellos gritaron aun más fuerte: "¡Crucifícalo!"<br><br>9.- "¿A vuestro Rey he de crucificar?" A lo cual los sumos sacerdotes respondieron: "Nosotros no tenemos más rey que el Cesar."<br><br>10.- Entonces Pilato, queriendo calmar la turba, lo entregó para ser crucificado.</div><div class="texto" style="text-align: center; font-weight: bold;">(10 Ave Marías)<br><br>Gloria al Padre...</div></div></div>
+        <div class="page grupo-dolorosos"><div class="page-content"><h3>CUARTO MISTERIO DOLOROSO</h3><h2>Jesús lleva la Cruz</h2><img src="" class="random-img"><div class="oraciones">Padre Nuestro...</div><div class="cita" style="font-size: 20px; text-align: left;">1.- "Si alguien quiere venir en pos de Mí, que renuncie a sí mismo"<br><br>2.- "Tome su cruz, cada día y sígame."<br><br>3.- Y a Él, llevando su cruz, lo condujeron al lugar llamado Gólgota.<br><br>4.- En el camino, echaron mano a un cierto Simón de Cirene, obligándolo a ir cargando la cruz, detrás de Jesús.<br><br>5.- "Tomad sobre vosotros Mi yugo, y aprended de mí."<br><br>6.- "Que soy manso y humilde de corazón."<br><br>7.- "Y encontrareis refugio para vuestras almas, porque Mi yugo es suave y Mi carga es ligera."<br><br>8.- Lo acompañaba una gran muchedumbre del pueblo y de mujeres que se lamentaban y lloraban por Él.<br><br>9.- Mas Jesús, volviéndose hacia ellas les dijo: "Hijas de Jerusalén, no lloréis por mí, sino por vosotras y por vuestros hijos."<br><br>10.- "Porque si esto hacen con el leño verde, ¿qué no harán con el seco?"</div><div class="texto" style="text-align: center; font-weight: bold;">(10 Ave Marías)<br><br>Gloria al Padre...</div></div></div>
+        <div class="page grupo-dolorosos"><div class="page-content"><h3>QUINTO MISTERIO DOLOROSO</h3><h2>La Crucifixión</h2><img src="" class="random-img"><div class="oraciones">Padre Nuestro...</div><div class="cita" style="font-size: 20px; text-align: left;">1.- Cuando llegaron al lugar llamado Calvario, lo crucificaron.<br><br>2.- Y Jesús dijo: "Padre, perdónalos porque no saben lo que hacen."<br><br>3.- Y uno de los bandidos crucificado con Él, le dijo: "Jesús, acuérdate de mí cuando llegues a tu Reino."<br><br>4.- Y Jesús le respondió: "En verdad, en verdad te digo: hoy estarás conmigo en el Paraíso."<br><br>5.- Junto a la cruz de Jesús, estaba de pie su Madre, y el discípulo que amaba.<br><br>6.- Jesús dijo a su Madre: "Mujer, he ahí a tu hijo." Después dijo al discípulo: "He ahí a tu Madre."<br><br>7.- Y desde ese momento, el discípulo la recibió en su casa.<br><br>8.- Tembló la Tierra, y las tinieblas la cubrieron, y el velo del templo se rasgó en dos.<br><br>9.- Y Jesús clamó con gran voz: "¡Padre, en Tus Manos entrego Mí Espíritu!"<br><br>10.- E inclinando la cabeza, expiró.</div><div class="texto" style="text-align: center; font-weight: bold;">(10 Ave Marías)<br><br>Gloria al Padre...</div></div></div>
+
+        <!-- ================= GLORIOSOS ================= -->
+        <div class="page portadilla grupo-gloriosos" style="background-color: #4A1030;">
+            <div class="page-content"><h1>MISTERIOS<br>GLORIOSOS</h1><p style="color: #B8893B; font-family: 'Cinzel', serif; font-size: 20px;">MIÉRCOLES Y DOMINGOS</p><p class="cita">«Reflexionen y tengan siempre ante los ojos de la mente, la gran humildad de la Madre de Dios.»</p></div>
+        </div>
+        <div class="page grupo-gloriosos"><div class="page-content"><h3>PRIMER MISTERIO GLORIOSO</h3><h2>La Resurrección</h2><img src="" class="random-img"><div class="oraciones">Padre Nuestro...</div><div class="cita" style="font-size: 20px; text-align: left;">1.- "En verdad. En verdad os digo que estaréis tristes, pero vuestra tristeza se convertirá en gozo."<br><br>2.- "Yo volveré a veros, y vuestro corazón se alegrará, y nadie os podrá quitar vuestra alegría."<br><br>3.- El primer día de la semana, muy de mañana, volvieron al sepulcro llevando los aromas que habían preparado.<br><br>4.- Y he aquí que un Ángel del Señor, bajó del Cielo, quitó la piedra y se sentó sobre ella.<br><br>5.- Habló el Ángel y le dijo a las mujeres: "Sé que buscáis a Jesús, el Crucificado. No está ya aquí."<br><br>6.- "Ha resucitado. Venid y ver el lugar donde estaba."<br><br>7.- "Él os precederá en Galilea. Allí lo veréis."<br><br>8.- Y ellas salieron aprisa del sepulcro, con asombro y gran gozo.<br><br>9.- "Yo soy la resurrección y la vida. Quien cree en mí, aunque muera, vivirá."<br><br>10.- "Y todo aquel que vive y cree en mí, no morirá jamás."</div><div class="texto" style="text-align: center; font-weight: bold;">(10 Ave Marías)<br><br>Gloria al Padre...</div></div></div>
+        <div class="page grupo-gloriosos"><div class="page-content"><h3>SEGUNDO MISTERIO GLORIOSO</h3><h2>La Ascensión</h2><img src="" class="random-img"><div class="oraciones">Padre Nuestro...</div><div class="cita" style="font-size: 20px; text-align: left;">1.- Le dice Jesús: Vete donde mis hermanos y diles: Subo a mi padre y vuestro Padre, a mi Dios y vuestro Dios”<br><br>2.- Jesús los guio hasta cerca de Betania y alzando las manos los bendijo.<br><br>3.- Todo poder me ha sido dado en el cielo y en la tierra.<br><br>4.- Id, pues y hacer discípulos a todas las gentes.<br><br>5.- Bautizándolas en el nombre del Padre y del Hijo y del Espíritu Santo.<br><br>6.- Enseñándoles a observar todo cuanto os he mandado.<br><br>7.- Quien creyere y fuere bautizado, será salvo.<br><br>8.- "Yo estaré con vosotros siempre. Hasta la consumación de los siglos."<br><br>9.- Dicho esto, fue elevándose. Y tras una nube, lo perdieron de vista.<br><br>10.- Y El Señor Jesús fue llevado al Cielo, y está sentado a la derecha del Padre.</div><div class="texto" style="text-align: center; font-weight: bold;">(10 Ave Marías)<br><br>Gloria al Padre...</div></div></div>
+        <div class="page grupo-gloriosos"><div class="page-content"><h3>TERCER MISTERIO GLORIOSO</h3><h2>La Venida del Espíritu Santo</h2><img src="" class="random-img"><div class="oraciones">Padre Nuestro...</div><div class="cita" style="font-size: 20px; text-align: left;">1.- Jesús sopló sobre ellos y les dijo: “Recibid el Espíritu Santo”<br><br>2.- A quienes perdonéis los pecados les quedarán perdonados, a quien se los retengáis les quedarán retenidos.<br><br>3.- Cuando llegó el día de Pentecostés, se hallaban todos juntos en un mismo lugar.<br><br>4.- Y de repente vino del cielo un ruido, como de viento que soplaba con ímpetu, que llenó la casa donde estaban reunidos.<br><br>5.- Y se les aparecieron lenguas como de fuego, posándose sobre cada uno de ellos.<br><br>6.- Todos fueron entonces llenos del Espíritu Santo y se pusieron a hablar de las maravillas de Dios.<br><br>7.- En aquel entonces había en Jerusalén judíos devotos provenientes de todas las naciones que hay bajo el cielo.<br><br>8.- Entonces Pedro, poniéndose de pie junto a los once levantó su voz y les habló.<br><br>9.- Arrepentíos y bautizaos y recibiréis el Don del Espíritu Santo.<br><br>10.- Y aquéllos que aceptaron sus palabras fueron bautizados y se sumaron en ese día cerca de tres mil almas.</div><div class="texto" style="text-align: center; font-weight: bold;">(10 Ave Marías)<br><br>Gloria al Padre...</div></div></div>
+        <div class="page grupo-gloriosos"><div class="page-content"><h3>CUARTO MISTERIO GLORIOSO</h3><h2>La Asunción de María</h2><img src="" class="random-img"><div class="oraciones">Padre Nuestro...</div><div class="cita" style="font-size: 20px; text-align: left;">1.- Bendita eres, oh Hija del Altísimo, sobre todas las mujeres de la Tierra.<br><br>2.- Porque Él ha hecho hoy, tan célebre tu nombre, que no cesarán nunca jamás de proclamar tus alabanzas.<br><br>3.- En todos los pueblos que oyeron mencionar tu nombre, será glorificado por causa tuya, el Dios de Israel.<br><br>4.- Tú eres la gloria de Jerusalén. Tú, la alegría de Israel. Tú, la honra de nuestro pueblo.<br><br>5.- Hazme ver tu rostro, déjame oír tu voz. Porque tu voz es dulce y tu rostro, encantador.<br><br>6.- Entonces se abrió el templo de Dios en el Cielo, y surgieron relámpagos y truenos.<br><br>7.- Y una gran señal apareció en el Cielo. Una mujer vestida con rayos de sol.<br><br>8.- Y la luna bajo sus pies. Y sobre su cabeza, una corona de doce estrellas.<br><br>9.- Toda hermosa, entra la Hija del Rey, vestida de tela de oro.<br><br>10.- Elevad a Dios un cántico nuevo, porque ha hecho cosas admirables.</div><div class="texto" style="text-align: center; font-weight: bold;">(10 Ave Marías)<br><br>Gloria al Padre...</div></div></div>
+        <div class="page grupo-gloriosos"><div class="page-content"><h3>QUINTO MISTERIO GLORIOSO</h3><h2>La Coronación de María</h2><img src="" class="random-img"><div class="oraciones">Padre Nuestro...</div><div class="cita" style="font-size: 20px; text-align: left;">1.- ¿Quién es aquella que viene hermosa como la aurora, bella como la luna, resplandeciente como el sol…<br><br>2.- …como el arcoíris que surge entre las nubes del Cielo. Como los retoños en las ramas de los árboles en primavera?<br><br>3.- "Soy la Madre del amor hermoso, de la ciencia y la esperanza cierta."<br><br>4.- "En mí, está la gracia para conocer el camino de la verdad. En mi está la esperanza de vida y de virtud."<br><br>5.- "Venid a mi todos los que buscáis amor, y saciaos con mis dulces frutos."<br><br>6.- "Me recordareis más dulce que la miel. Manjar más rico que un panal."<br><br>7.- "Así pues, oh hijos míos, escuchad mis enseñanzas y no rechacéis mis consejos"<br><br>8.- "Bienaventurados los que siguen mis caminos, y velan a las puertas de mi casa, día tras día."<br><br>9.- "Quien me hallare, hallará la vida y alcanzará el favor de Dios."<br><br>10.- Dios te salve Reina de misericordia. Protégenos del enemigo y recíbenos en la hora de la muerte.</div><div class="texto" style="text-align: center; font-weight: bold;">(10 Ave Marías)<br><br>Gloria al Padre...</div></div></div>
+
+        <!-- PÁGINAS FINALES -->
+        <div class="page"><div class="page-content"><h2>Promesas del Rosario</h2><div class="texto" style="text-align: left;">1. Cualquiera que rece con fe el Rosario, me servirá fielmente y recibirá gracias.<br><br>2. Prometo mi especial protección y grandes gracias a aquellos que recen el Rosario.<br><br>3. El Rosario es un arma poderosa contra el infierno.<br><br>4. El alma que reza el Rosario no perecerá.<br><br>5. Obtendrás todo lo que me pidas con el rezo del Rosario.<br><br>6. La devoción de mi Rosario es un gran signo de predestinación.</div></div></div>
+        <div class="page"><div class="page-content"><h2>Oración del Padre Pío</h2><div class="texto" style="text-align: center; font-style: italic;">Señor Jesucristo, que por amor a los hombres permaneces noche y día en el Sacramento del Altar, esperando, llamando, acogiendo a los que vienen a visitarte. Yo creo que estás presente en el Sagrario. Te adoro, abismado en mi propia nada. Te agradezco por tantas gracias que me has concedido, en especial, por haberte entregado a mí. Por haberme dado como Madre a tu misma Madre y por haberme llamado a esta Iglesia. Amén.</div></div></div>
+
+        <!-- CONTRAPORTADA -->
+        <div class="page page-cover" data-density="hard">
+            <div class="page-content">
+                <h2 style="color: #B8893B;">Fin del Rosario</h2>
+                <p style="font-style: italic; color: #B8893B; font-size: 22px; margin-top: 20px;">«El tiempo transcurrido en glorificar a Dios y en cuidar la salud del alma, no será nunca tiempo perdido.»</p>
+                <span style="color: #FDF8F0; font-family: 'Cinzel', serif; margin-top: 30px; font-size: 20px;">— SAN PADRE PÍO —</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let pageFlip;
+
+        function toggleSettings() {
+            const panel = document.getElementById('settings-panel');
+            panel.style.display = (panel.style.display === 'flex') ? 'none' : 'flex';
+        }
+
+        function handleMultipleImages(event) {
+            const files = event.target.files;
+            if (files.length === 0) return;
+            let processedImages = [];
+            let count = 0;
+            Array.from(files).forEach(file => {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const img = new Image();
+                    img.onload = function() {
+                        const canvas = document.createElement('canvas');
+                        const MAX_WIDTH = 800; 
+                        let scale = 1;
+                        if (img.width > MAX_WIDTH) { scale = MAX_WIDTH / img.width; }
+                        canvas.width = img.width * scale;
+                        canvas.height = img.height * scale;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                        processedImages.push(canvas.toDataURL('image/jpeg', 0.8));
+                        count++;
+                        if (count === files.length) {
+                            localStorage.setItem('galeria_fotos', JSON.stringify(processedImages));
+                            applyRandomImages();
+                            alert("¡Fotos subidas con éxito!");
+                            toggleSettings();
+                        }
+                    };
+                    img.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+
+        function applyRandomImages() {
+            const saved = localStorage.getItem('galeria_fotos');
+            if (!saved) return;
+            const images = JSON.parse(saved);
+            if (images.length === 0) return;
+            images.sort(() => Math.random() - 0.5);
+            const cover = document.getElementById('bg-cover');
+            if(cover) cover.style.backgroundImage = `linear-gradient(rgba(26,15,10,0.85), rgba(26,15,10,0.95)), url('${images[0]}')`;
+            document.querySelectorAll('.random-img').forEach((imgTag, index) => {
+                imgTag.src = images[(index + 1) % images.length];
+                imgTag.style.display = 'block'; 
+            });
+        }
+
+        document.addEventListener("DOMContentLoaded", function() {
+            applyRandomImages();
+
+            // Lógica del día de la semana
+            const hoy = new Date().getDay(); 
+            let claseGrupoHoy = '';
+            if (hoy === 1 || hoy === 6) claseGrupoHoy = '.grupo-gozosos';       // Lunes y Sábado
+            else if (hoy === 2 || hoy === 5) claseGrupoHoy = '.grupo-dolorosos'; // Martes y Viernes
+            else if (hoy === 4) claseGrupoHoy = '.grupo-luminosos';            // Jueves
+            else claseGrupoHoy = '.grupo-gloriosos';                           // Miércoles y Domingo
+
+            const todosLosGrupos = ['.grupo-gozosos', '.grupo-luminosos', '.grupo-dolorosos', '.grupo-gloriosos'];
+            todosLosGrupos.forEach(clase => {
+                if (clase !== claseGrupoHoy) {
+                    document.querySelectorAll(clase).forEach(el => el.remove());
+                }
+            });
+
+            const book = document.getElementById('book');
+            pageFlip = new St.PageFlip(book, {
+                width: 400, 
+                height: 700, 
+                size: "stretch", 
+                minWidth: 300, 
+                maxWidth: 800, 
+                minHeight: 500, 
+                maxHeight: 1000,
+                drawShadow: true, 
+                flippingTime: 800, 
+                usePortrait: true, 
+                startZIndex: 0, 
+                autoSize: true, 
+                maxShadowOpacity: 0.6, 
+                showCover: true, 
+                mobileScrollSupport: false 
+            });
+            pageFlip.loadFromHTML(document.querySelectorAll('.page'));
+        });
+    </script>
+</body>
+</html>
