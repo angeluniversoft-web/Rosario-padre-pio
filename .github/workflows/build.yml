@@ -17,14 +17,14 @@ jobs:
         with:
           java-version: '17'
           distribution: 'temurin'
-          
+
+      - name: Configurar Android SDK
+        uses: android-actions/setup-android@v3
+
       - name: Configurar Gradle
         uses: gradle/actions/setup-gradle@v3
         with:
           gradle-version: 8.2
-
-      - name: Dar permisos de ejecución (por si acaso)
-        run: chmod +x ./gradlew || true
 
       - name: Compilar APK
         run: gradle assembleDebug --no-daemon --stacktrace
